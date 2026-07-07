@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment Countdown</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="screen">
+    <div class="background-glow background-glow-left"></div>
+    <div class="background-glow background-glow-right"></div>
+
+    <section class="hero">
+      <p class="eyebrow">Classroom Timer</p>
+      <h1 id="title">Finish Your Assignment</h1>
+      <p id="subtitle" class="subtitle">Use the remaining time to complete and submit your work.</p>
+    </section>
+
+    <section class="timer-shell" aria-label="Countdown timer">
+      <div class="timer" id="timer">
+        <article class="time-card">
+          <span class="time-value" id="hours">00</span>
+          <span class="time-label">Hours</span>
+        </article>
+        <div class="time-separator">:</div>
+        <article class="time-card">
+          <span class="time-value" id="minutes">00</span>
+          <span class="time-label">Minutes</span>
+        </article>
+        <div class="time-separator">:</div>
+        <article class="time-card">
+          <span class="time-value" id="seconds">00</span>
+          <span class="time-label">Seconds</span>
+        </article>
+      </div>
+
+      <div class="status-row">
+        <p class="status-text" id="statusText">Timer is running</p>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="setup-panel" aria-label="Timer setup">
+      <div class="setup-copy">
+        <h2>Quick setup</h2>
+        <p>Set a duration before showing this on the digi board.</p>
+      </div>
+      <form id="setupForm" class="setup-form">
+        <label>
+          <span>Minutes</span>
+          <input id="durationInput" name="minutes" type="number" min="1" max="600" value="45">
+        </label>
+        <label>
+          <span>Title</span>
+          <input id="titleInput" name="title" type="text" maxlength="60" value="Finish Your Assignment">
+        </label>
+        <label>
+          <span>Subtitle</span>
+          <input id="subtitleInput" name="subtitle" type="text" maxlength="100" value="Use the remaining time to complete and submit your work.">
+        </label>
+        <div class="button-row">
+          <button type="submit" class="primary-button">Start Timer</button>
+          <button type="button" id="pauseButton" class="ghost-button">Pause</button>
+          <button type="button" id="restartButton" class="ghost-button">Restart</button>
+          <button type="button" id="testBeepButton" class="ghost-button">Test Beeps</button>
+        </div>
+      </form>
+      <p class="setup-hint">These values are stored in a cookie on this browser and reused as the default next time.</p>
+    </section>
+  </main>
+
+  <template id="finishedMessageTemplate">
+    <div class="finished-state">
+      <p class="finished-eyebrow">Time is up</p>
+      <button type="button" class="quiet-button">Quiet Alarm</button>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
