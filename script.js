@@ -8,7 +8,9 @@ const progressBarElement = document.getElementById("progressBar");
 const timerShellElement = document.querySelector(".timer-shell");
 const timerElement = document.getElementById("timer");
 const setupForm = document.getElementById("setupForm");
-const durationInput = document.getElementById("durationInput");
+const durationMinutesInput = document.getElementById("durationMinutesInput");
+const durationSecondsInput = document.getElementById("durationSecondsInput");
+const presetButtons = document.querySelectorAll(".preset-button");
 const titleInput = document.getElementById("titleInput");
 const subtitleInput = document.getElementById("subtitleInput");
 const pauseButton = document.getElementById("pauseButton");
@@ -16,7 +18,7 @@ const restartButton = document.getElementById("restartButton");
 const testBeepButton = document.getElementById("testBeepButton");
 const finishedMessageTemplate = document.getElementById("finishedMessageTemplate");
 const defaultConfiguration = {
-  minutes: 45,
+  durationSeconds: 45 * 60,
   title: "Finish Your Assignment",
   subtitle: "Use the remaining time to complete and submit your work.",
 };
@@ -124,25 +126,64 @@ function setCookie(name, value, maxAgeSeconds) {
   document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${maxAgeSeconds}; path=/; samesite=lax`;
 }
 
-function saveConfiguration(minutes, title, subtitle) {
+function saveConfiguration(durationSeconds, title, subtitle) {
   const oneYearInSeconds = 60 * 60 * 24 * 365;
-  setCookie("countdown_minutes", String(minutes), oneYearInSeconds);
+  setCookie("countdown_duration_seconds", String(durationSeconds), oneYearInSeconds);
   setCookie("countdown_title", title, oneYearInSeconds);
   setCookie("countdown_subtitle", subtitle, oneYearInSeconds);
 }
 
 function readConfiguration() {
+  const savedDurationSeconds = Number(getCookie("countdown_duration_seconds"));
   const savedMinutes = Number(getCookie("countdown_minutes"));
-  const minutes = Number.isFinite(savedMinutes) && savedMinutes > 0 ? savedMinutes : defaultConfiguration.minutes;
+  const durationSeconds = Number.isFinite(savedDurationSeconds) && savedDurationSeconds > 0
+    ? Math.round(savedDurationSeconds)
+    : Number.isFinite(savedMinutes) && savedMinutes > 0
+      ? Math.round(savedMinutes * 60)
+      : defaultConfiguration.durationSeconds;
   const title = getCookie("countdown_title") || defaultConfiguration.title;
   const subtitle = getCookie("countdown_subtitle") || defaultConfiguration.subtitle;
 
-  durationInput.value = String(minutes);
+  setDurationInputs(durationSeconds);
   titleInput.value = title;
   subtitleInput.value = subtitle;
 
   applyCopy(title, subtitle);
-  startTimer(minutes);
+  startTimer(durationSeconds);
+}
+
+function setDurationInputs(durationSeconds) {
+  durationMinutesInput.value = String(Math.floor(durationSeconds / 60));
+  durationSecondsInput.value = String(durationSeconds % 60);
+  validateDuration();
+  updateActivePreset(durationSeconds);
+}
+
+function getDurationSeconds() {
+  const minutes = Number(durationMinutesInput.value);
+  const seconds = Number(durationSecondsInput.value);
+
+  if (!Number.isInteger(minutes) || !Number.isInteger(seconds)) {
+    return 0;
+  }
+
+  return minutes * 60 + seconds;
+}
+
+function validateDuration() {
+  const durationSeconds = getDurationSeconds();
+  durationSecondsInput.setCustomValidity(
+    durationSeconds > 0 ? "" : "Enter a duration of at least 1 second.",
+  );
+  return durationSeconds > 0;
+}
+
+function updateActivePreset(durationSeconds = getDurationSeconds()) {
+  presetButtons.forEach((button) => {
+    const isActive = Number(button.dataset.durationSeconds) === durationSeconds;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function applyCopy(title, subtitle) {
@@ -150,8 +191,8 @@ function applyCopy(title, subtitle) {
   subtitleElement.textContent = subtitle;
 }
 
-function startTimer(durationMinutes) {
-  totalDurationMs = durationMinutes * 60 * 1000;
+function startTimer(durationSeconds) {
+  totalDurationMs = durationSeconds * 1000;
   endTime = Date.now() + totalDurationMs;
   isPaused = false;
   pausedRemainingMs = 0;
@@ -194,9 +235,25 @@ function togglePause() {
   statusTextElement.textContent = "Timer is paused";
 }
 
+function restartTimer() {
+  unlockAudio();
+
+  if (!setupForm.reportValidity() || !validateDuration()) {
+    return;
+  }
+
+  const durationSeconds = getDurationSeconds();
+  const title = titleInput.value.trim() || defaultConfiguration.title;
+  const subtitle = subtitleInput.value.trim() || defaultConfiguration.subtitle;
+
+  applyCopy(title, subtitle);
+  saveConfiguration(durationSeconds, title, subtitle);
+  startTimer(durationSeconds);
+}
+
 function updateTimer() {
   const remainingMs = Math.max(0, endTime - Date.now());
-  const remainingSeconds = Math.floor(remainingMs / 1000);
+  const remainingSeconds = Math.ceil(remainingMs / 1000);
 
   const hours = Math.floor(remainingSeconds / 3600);
   const minutes = Math.floor((remainingSeconds % 3600) / 60);
@@ -243,27 +300,36 @@ setupForm.addEventListener("submit", (event) => {
   event.preventDefault();
   unlockAudio();
 
-  const minutes = Math.max(1, Number(durationInput.value) || 45);
+  if (!validateDuration()) {
+    setupForm.reportValidity();
+    return;
+  }
+
+  const durationSeconds = getDurationSeconds();
   const title = titleInput.value.trim() || defaultConfiguration.title;
   const subtitle = subtitleInput.value.trim() || defaultConfiguration.subtitle;
 
   applyCopy(title, subtitle);
-  saveConfiguration(minutes, title, subtitle);
-  startTimer(minutes);
+  saveConfiguration(durationSeconds, title, subtitle);
+  startTimer(durationSeconds);
+});
+
+[durationMinutesInput, durationSecondsInput].forEach((input) => {
+  input.addEventListener("input", () => {
+    validateDuration();
+    updateActivePreset();
+  });
+});
+
+presetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setDurationInputs(Number(button.dataset.durationSeconds));
+  });
 });
 
 pauseButton.addEventListener("click", togglePause);
 
-restartButton.addEventListener("click", () => {
-  unlockAudio();
-  const minutes = Math.max(1, Number(durationInput.value) || defaultConfiguration.minutes);
-  const title = titleInput.value.trim() || defaultConfiguration.title;
-  const subtitle = subtitleInput.value.trim() || defaultConfiguration.subtitle;
-
-  applyCopy(title, subtitle);
-  saveConfiguration(minutes, title, subtitle);
-  startTimer(minutes);
-});
+restartButton.addEventListener("click", restartTimer);
 
 testBeepButton.addEventListener("click", () => {
   unlockAudio();
@@ -271,5 +337,27 @@ testBeepButton.addEventListener("click", () => {
 });
 
 document.addEventListener("pointerdown", unlockAudio, { once: true });
+
+document.addEventListener("keydown", (event) => {
+  if (event.repeat) {
+    return;
+  }
+
+  const target = event.target;
+  const isEditing = target instanceof HTMLElement
+    && (target.isContentEditable || target.matches("input, textarea, select"));
+
+  if (isEditing) {
+    return;
+  }
+
+  if (event.code === "Space") {
+    event.preventDefault();
+    togglePause();
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    restartTimer();
+  }
+});
 
 readConfiguration();

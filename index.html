@@ -49,10 +49,29 @@
         <p>Set a duration before showing this on the digi board.</p>
       </div>
       <form id="setupForm" class="setup-form">
-        <label>
-          <span>Minutes</span>
-          <input id="durationInput" name="minutes" type="number" min="1" max="600" value="45">
-        </label>
+        <div class="duration-fields">
+          <label>
+            <span>Minutes</span>
+            <input id="durationMinutesInput" name="minutes" type="number" min="0" max="600" step="1" value="45" required>
+          </label>
+          <label>
+            <span>Seconds</span>
+            <input id="durationSecondsInput" name="seconds" type="number" min="0" max="59" step="1" value="0" required>
+          </label>
+        </div>
+        <fieldset class="duration-presets">
+          <legend>Quick durations</legend>
+          <div class="preset-row">
+            <button type="button" class="preset-button" data-duration-seconds="30">0:30</button>
+            <button type="button" class="preset-button" data-duration-seconds="60">1:00</button>
+            <button type="button" class="preset-button" data-duration-seconds="90">1:30</button>
+            <button type="button" class="preset-button" data-duration-seconds="120">2:00</button>
+            <button type="button" class="preset-button" data-duration-seconds="180">3:00</button>
+            <button type="button" class="preset-button" data-duration-seconds="240">4:00</button>
+            <button type="button" class="preset-button" data-duration-seconds="300">5:00</button>
+            <button type="button" class="preset-button" data-duration-seconds="600">10:00</button>
+          </div>
+        </fieldset>
         <label>
           <span>Title</span>
           <input id="titleInput" name="title" type="text" maxlength="60" value="Finish Your Assignment">
@@ -68,7 +87,7 @@
           <button type="button" id="testBeepButton" class="ghost-button">Test Beeps</button>
         </div>
       </form>
-      <p class="setup-hint">These values are stored in a cookie on this browser and reused as the default next time.</p>
+      <p class="setup-hint">These values are stored in a cookie on this browser and reused as the default next time. The minimum duration is 1 second.</p>
     </section>
   </main>
 

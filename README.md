@@ -5,9 +5,11 @@ A clear, fullscreen-friendly countdown timer for classroom digi boards. It is de
 ## Features
 
 - Large `HH:MM:SS` countdown display with a digital seven-segment font.
-- Editable title, subtitle, and duration.
+- Editable title, subtitle, and duration, down to a single second.
+- Quick duration presets for common short timers.
 - Settings are stored in browser cookies and reused as defaults.
 - Pause/resume, restart, and test-beep controls.
+- Keyboard shortcuts: Space pauses/resumes and Enter restarts the timer.
 - Progress bar with a warning style during the final part of the countdown.
 - Finish alarm: three beeps, repeated every 10 seconds for up to 2 minutes.
 - Quiet alarm button to stop and hide the finish alarm.
@@ -37,10 +39,11 @@ http://localhost:8000
 ## Usage
 
 1. Scroll to the setup panel.
-2. Set the duration in minutes.
+2. Set the duration in minutes and seconds, or choose a quick duration.
 3. Optionally change the title and subtitle.
 4. Press `Start Timer`.
 5. Use `Pause`, `Restart`, or `Test Beeps` as needed.
+   You can also press Space to pause/resume or Enter to restart.
 6. When the timer finishes, press `Quiet Alarm` to stop the repeating beeps.
 
 ## Browser Audio Note

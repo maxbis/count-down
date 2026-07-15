@@ -239,6 +239,12 @@ h1,
   gap: 1rem;
 }
 
+.duration-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
 .setup-form label {
   display: grid;
   gap: 0.45rem;
@@ -257,6 +263,41 @@ h1,
   color: var(--text);
   padding: 0.9rem 1rem;
   font: inherit;
+}
+
+.duration-presets {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.duration-presets legend {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.preset-button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  background: rgba(4, 9, 19, 0.45);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.preset-button:hover,
+.preset-button:focus-visible,
+.preset-button.is-active {
+  border-color: var(--accent);
+  background: rgba(255, 183, 3, 0.14);
 }
 
 .button-row {
@@ -360,6 +401,12 @@ code {
   .setup-panel {
     grid-template-columns: 1fr;
     margin-top: 6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .duration-fields {
+    grid-template-columns: 1fr;
   }
 }
 
